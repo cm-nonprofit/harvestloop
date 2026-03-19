@@ -1,0 +1,1308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HarvestLoop — Closing the Loop on Food Waste & Hunger</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #FEFCF8;
+  --surface: #F5F0E8;
+  --text: #2D2A26;
+  --muted: #8A8279;
+  --primary: #4A7C59;
+  --secondary: #E8A838;
+  --accent: #D4723C;
+  --donate: #E05A2B;
+  --glass-bg: rgba(254, 252, 248, 0.72);
+  --glass-border: rgba(74, 124, 89, 0.15);
+  --radius: 20px;
+  --radius-sm: 12px;
+  --shadow: 0 4px 24px rgba(45, 42, 38, 0.08);
+  --shadow-lg: 0 12px 48px rgba(45, 42, 38, 0.12);
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  line-height: 1.7;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+h1, h2, h3, h4 {
+  font-family: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+  line-height: 1.2;
+  font-weight: 400;
+}
+
+h1 { font-size: clamp(2.4rem, 5vw, 4rem); }
+h2 { font-size: clamp(1.8rem, 3.5vw, 2.8rem); margin-bottom: 1rem; }
+h3 { font-size: clamp(1.2rem, 2vw, 1.5rem); margin-bottom: 0.5rem; }
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+a { color: var(--primary); text-decoration: none; transition: color 0.3s; }
+a:hover { color: var(--accent); }
+
+img { max-width: 100%; height: auto; display: block; }
+
+/* Animations */
+[data-animate] {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+[data-animate].visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+[data-animate].no-io {
+  opacity: 1;
+  transform: none;
+}
+
+/* ===== NAV ===== */
+.nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 1000;
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  background: var(--glass-bg);
+  border-bottom: 1px solid var(--glass-border);
+  transition: box-shadow 0.3s;
+}
+.nav.scrolled { box-shadow: var(--shadow); }
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.4rem;
+  color: var(--primary);
+}
+.nav-logo svg { flex-shrink: 0; }
+.nav-links { display: flex; align-items: center; gap: 28px; list-style: none; }
+.nav-links a {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.02em;
+  transition: color 0.3s;
+}
+.nav-links a:hover { color: var(--primary); }
+.nav-donate {
+  background: var(--donate);
+  color: #fff !important;
+  padding: 10px 22px;
+  border-radius: 50px;
+  font-weight: 600;
+  transition: background 0.3s, transform 0.2s;
+}
+.nav-donate:hover { background: #c9491f; color: #fff !important; transform: translateY(-1px); }
+.nav-donate:focus { outline: 3px solid var(--secondary); outline-offset: 2px; }
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+.hamburger span {
+  display: block;
+  width: 24px;
+  height: 2px;
+  background: var(--text);
+  margin: 5px 0;
+  border-radius: 2px;
+  transition: transform 0.3s, opacity 0.3s;
+}
+
+/* ===== HERO ===== */
+#home {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  padding-top: 80px;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  background: url('assets/hero-bg.jpg') center/cover no-repeat;
+  filter: brightness(0.35);
+  z-index: 0;
+}
+.hero-content {
+  position: relative;
+  z-index: 1;
+  max-width: 720px;
+  padding: 60px 24px;
+}
+.hero-badge {
+  display: inline-block;
+  background: rgba(74, 124, 89, 0.2);
+  color: #b5dfc2;
+  padding: 6px 18px;
+  border-radius: 50px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(74, 124, 89, 0.3);
+}
+#home h1 {
+  color: #fff;
+  margin-bottom: 20px;
+}
+#home .hero-sub {
+  color: rgba(255,255,255,0.85);
+  font-size: 1.15rem;
+  max-width: 560px;
+  margin-bottom: 36px;
+  line-height: 1.8;
+}
+.hero-btns {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 32px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: inherit;
+}
+.btn:focus { outline: 3px solid var(--secondary); outline-offset: 2px; }
+.btn-primary { background: var(--primary); color: #fff; }
+.btn-primary:hover { background: #3d6a4b; color: #fff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(74,124,89,0.3); }
+.btn-donate { background: var(--donate); color: #fff; }
+.btn-donate:hover { background: #c9491f; color: #fff; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(224,90,43,0.3); }
+.btn-outline { background: transparent; color: #fff; border: 2px solid rgba(255,255,255,0.4); }
+.btn-outline:hover { border-color: #fff; background: rgba(255,255,255,0.1); color: #fff; }
+
+.hero-svg {
+  position: absolute;
+  right: -40px;
+  bottom: -20px;
+  z-index: 0;
+  opacity: 0.15;
+}
+
+/* Organic divider */
+.section-divider {
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+.section-divider svg { display: block; width: 100%; }
+
+/* ===== PROBLEM ===== */
+#problem {
+  padding: 100px 0;
+  background: var(--surface);
+  position: relative;
+}
+.problem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+  align-items: center;
+}
+.problem-img {
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+.problem-img img {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+}
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-top: 32px;
+}
+.stat-card {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  padding: 24px;
+  border-radius: var(--radius-sm);
+}
+.stat-num {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 2rem;
+  color: var(--accent);
+}
+.stat-label {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* ===== EVOLUTION ===== */
+#evolution {
+  padding: 100px 0;
+  background: var(--bg);
+}
+.evo-timeline {
+  position: relative;
+  max-width: 700px;
+  margin: 48px auto 0;
+}
+.evo-timeline::before {
+  content: '';
+  position: absolute;
+  left: 24px;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(to bottom, var(--primary), var(--secondary));
+  border-radius: 3px;
+}
+.evo-step {
+  position: relative;
+  padding-left: 64px;
+  margin-bottom: 40px;
+}
+.evo-dot {
+  position: absolute;
+  left: 13px;
+  top: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 4px solid var(--bg);
+  box-shadow: 0 0 0 3px var(--primary);
+}
+.evo-step:nth-child(even) .evo-dot { background: var(--secondary); box-shadow: 0 0 0 3px var(--secondary); }
+.evo-step h3 { color: var(--primary); }
+.evo-step p { color: var(--muted); font-size: 0.95rem; }
+
+/* ===== PROGRAMS ===== */
+#programs {
+  padding: 100px 0;
+  background: var(--surface);
+}
+.programs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 28px;
+  margin-top: 48px;
+}
+.program-card {
+  background: #fff;
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+.program-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-lg); }
+.program-card-img {
+  height: 200px;
+  overflow: hidden;
+}
+.program-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+.program-card:hover .program-card-img img { transform: scale(1.05); }
+.program-card-body {
+  padding: 28px;
+}
+.program-card-body .tag {
+  display: inline-block;
+  background: rgba(74,124,89,0.1);
+  color: var(--primary);
+  padding: 4px 12px;
+  border-radius: 50px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 12px;
+}
+.program-card-body p {
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+/* ===== IMPACT ===== */
+#impact {
+  padding: 100px 0;
+  background: var(--bg);
+  position: relative;
+}
+.impact-hero {
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 60px;
+}
+.impact-hero img {
+  width: 100%;
+  height: 340px;
+  object-fit: cover;
+}
+.impact-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, rgba(74,124,89,0.9), rgba(74,124,89,0.4));
+  display: flex;
+  align-items: center;
+  padding: 48px;
+}
+.impact-hero-text h2 { color: #fff; margin-bottom: 12px; }
+.impact-hero-text p { color: rgba(255,255,255,0.85); max-width: 500px; font-size: 1.05rem; }
+
+.impact-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 24px;
+}
+.impact-stat {
+  text-align: center;
+  padding: 36px 20px;
+  background: #fff;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow);
+}
+.impact-stat .icon-wrap {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(74,124,89,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+.impact-stat .num {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 2.4rem;
+  color: var(--primary);
+}
+.impact-stat .label {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-top: 4px;
+}
+
+/* ===== FOUNDER ===== */
+#founder {
+  padding: 100px 0;
+  background: var(--surface);
+}
+.founder-grid {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 48px;
+  align-items: center;
+  margin-top: 48px;
+}
+.founder-portrait {
+  width: 280px;
+  height: 280px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 6px solid #fff;
+  box-shadow: var(--shadow-lg);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(74,124,89,0.08);
+}
+.founder-portrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.founder-info .quote {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.3rem;
+  color: var(--primary);
+  font-style: italic;
+  margin-bottom: 20px;
+  position: relative;
+  padding-left: 20px;
+  border-left: 4px solid var(--secondary);
+}
+.founder-info p { color: var(--muted); margin-bottom: 12px; font-size: 0.95rem; }
+.founder-info .name-title { font-weight: 600; color: var(--text); }
+
+/* ===== CONTACT ===== */
+#contact {
+  padding: 100px 0;
+  background: var(--bg);
+}
+.contact-wrap {
+  max-width: 600px;
+  margin: 0 auto;
+}
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-top: 32px;
+}
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-group label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text);
+}
+.form-group input,
+.form-group textarea {
+  padding: 14px 18px;
+  border: 2px solid rgba(74,124,89,0.15);
+  border-radius: var(--radius-sm);
+  font-size: 0.95rem;
+  font-family: inherit;
+  background: #fff;
+  transition: border-color 0.3s;
+  color: var(--text);
+}
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+.form-group textarea { resize: vertical; min-height: 120px; }
+.form-group input.invalid,
+.form-group textarea.invalid {
+  border-color: var(--donate);
+}
+.contact-email-note {
+  text-align: center;
+  color: var(--muted);
+  margin-top: 12px;
+  font-size: 0.9rem;
+}
+
+/* ===== DONATE ===== */
+#donate {
+  padding: 100px 0;
+  background: linear-gradient(135deg, var(--primary), #3d6a4b);
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+#donate h2 { color: #fff; }
+#donate p { color: rgba(255,255,255,0.85); }
+
+.donate-card {
+  max-width: 560px;
+  margin: 40px auto 0;
+  background: rgba(255,255,255,0.12);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: var(--radius);
+  padding: 40px;
+}
+.amount-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.amount-btn {
+  padding: 14px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: inherit;
+}
+.amount-btn:hover, .amount-btn.active {
+  background: rgba(255,255,255,0.2);
+  border-color: #fff;
+}
+.amount-btn:focus { outline: 3px solid var(--secondary); outline-offset: 2px; }
+.custom-amount {
+  width: 100%;
+  padding: 14px 18px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.08);
+  color: #fff;
+  font-size: 1rem;
+  font-family: inherit;
+  margin-bottom: 20px;
+}
+.custom-amount::placeholder { color: rgba(255,255,255,0.5); }
+.custom-amount:focus { outline: none; border-color: #fff; }
+.donate-submit {
+  width: 100%;
+  padding: 16px;
+  background: var(--donate);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s;
+  font-family: inherit;
+}
+.donate-submit:hover { background: #c9491f; transform: translateY(-2px); box-shadow: 0 8px 24px rgba(224,90,43,0.4); }
+.donate-submit:focus { outline: 3px solid var(--secondary); outline-offset: 2px; }
+.donate-desc {
+  text-align: center;
+  margin-bottom: 28px;
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.8);
+}
+.donate-bg-svg {
+  position: absolute;
+  right: -100px;
+  bottom: -100px;
+  opacity: 0.08;
+  z-index: 0;
+}
+.donate-card { position: relative; z-index: 1; }
+
+/* ===== FOOTER ===== */
+.footer {
+  background: var(--text);
+  color: rgba(255,255,255,0.7);
+  padding: 48px 0 28px;
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 32px;
+}
+.footer-brand {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.3rem;
+  color: #fff;
+  margin-bottom: 8px;
+}
+.footer-tagline { font-size: 0.85rem; max-width: 280px; }
+.footer-nav { display: flex; gap: 24px; list-style: none; flex-wrap: wrap; }
+.footer-nav a { color: rgba(255,255,255,0.7); font-size: 0.88rem; transition: color 0.3s; }
+.footer-nav a:hover { color: #fff; }
+.footer-email { color: var(--secondary); }
+.footer-bottom {
+  text-align: center;
+  margin-top: 36px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255,255,255,0.1);
+  font-size: 0.82rem;
+}
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed;
+  bottom: 32px;
+  right: 32px;
+  background: var(--primary);
+  color: #fff;
+  padding: 16px 28px;
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  font-weight: 500;
+  z-index: 9999;
+  transform: translateY(120px);
+  opacity: 0;
+  transition: all 0.4s ease;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(45,42,38,0.6);
+  backdrop-filter: blur(6px);
+  z-index: 9998;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.modal-overlay.show { display: flex; }
+.modal {
+  background: #fff;
+  border-radius: var(--radius);
+  padding: 48px;
+  max-width: 440px;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+.modal h3 { color: var(--primary); margin-bottom: 12px; }
+.modal p { color: var(--muted); margin-bottom: 24px; }
+.modal-close {
+  padding: 12px 32px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-weight: 600;
+  font-family: inherit;
+  transition: background 0.3s;
+}
+.modal-close:hover { background: #3d6a4b; }
+.modal-close:focus { outline: 3px solid var(--secondary); outline-offset: 2px; }
+.modal-check {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  background: rgba(74,124,89,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ===== SECTION LABEL ===== */
+.section-label {
+  text-align: center;
+  margin-bottom: 48px;
+}
+.section-label .overline {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--primary);
+  margin-bottom: 8px;
+}
+.section-label p {
+  color: var(--muted);
+  max-width: 580px;
+  margin: 0 auto;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  .nav-links {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: var(--glass-bg);
+    backdrop-filter: blur(18px);
+    flex-direction: column;
+    padding: 20px;
+    gap: 16px;
+    border-bottom: 1px solid var(--glass-border);
+  }
+  .nav-links.open { display: flex; }
+  .hamburger { display: block; }
+  .problem-grid { grid-template-columns: 1fr; }
+  .founder-grid { grid-template-columns: 1fr; text-align: center; }
+  .founder-info .quote { text-align: left; }
+  .hero-content { padding: 40px 24px; }
+  .impact-hero-overlay { padding: 24px; }
+  .amount-grid { grid-template-columns: repeat(2, 1fr); }
+  .footer-inner { flex-direction: column; text-align: center; }
+  .footer-nav { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav" role="navigation" aria-label="Main navigation">
+  <div class="nav-inner">
+    <a href="#home" class="nav-logo" aria-label="HarvestLoop Home">
+      <!-- Logo SVG: circular arrows forming a loop with a leaf -->
+      <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="18" cy="18" r="16" stroke="#4A7C59" stroke-width="2.5" fill="rgba(74,124,89,0.08)"/>
+        <path d="M12 20c0-4.4 3.6-8 8-8" stroke="#4A7C59" stroke-width="2" stroke-linecap="round"/>
+        <path d="M20 12l2.5-2.5M20 12l-2.5-2.5" stroke="#4A7C59" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M24 16c0 4.4-3.6 8-8 8" stroke="#E8A838" stroke-width="2" stroke-linecap="round"/>
+        <path d="M16 24l-2.5 2.5M16 24l2.5 2.5" stroke="#E8A838" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <ellipse cx="18" cy="18" rx="2.5" ry="3.5" fill="#4A7C59" transform="rotate(-30 18 18)" opacity="0.6"/>
+      </svg>
+      HarvestLoop
+    </a>
+    <button class="hamburger" aria-label="Toggle menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#problem">About Us</a></li>
+      <li><a href="#contact">Contact</a></li>
+      <li><a href="#donate" class="nav-donate">Donate</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-bg" role="img" aria-label="Volunteers serving food at a community event"></div>
+  <div class="container hero-content">
+    <div class="hero-badge">Rescuing Meals, Restoring Dignity</div>
+    <h1>Every Surplus Plate<br>Deserves a Seat at<br>Someone's Table</h1>
+    <p class="hero-sub">We intercept perfectly good food before it hits the landfill and route it to shelters and families who need it most — the same day, every day.</p>
+    <div class="hero-btns">
+      <a href="#programs" class="btn btn-primary">See Our Programs</a>
+      <a href="#donate" class="btn btn-donate">Donate Now</a>
+    </div>
+  </div>
+  <!-- Hero decorative SVG: flowing organic shapes representing food cycle -->
+  <svg class="hero-svg" width="500" height="500" viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="250" cy="250" r="200" stroke="#fff" stroke-width="1" opacity="0.3"/>
+    <circle cx="250" cy="250" r="150" stroke="#E8A838" stroke-width="1" opacity="0.3"/>
+    <circle cx="250" cy="250" r="100" stroke="#fff" stroke-width="1" opacity="0.3"/>
+    <path d="M150 250 Q200 150 250 250 Q300 350 350 250" stroke="#E8A838" stroke-width="2" fill="none" opacity="0.3"/>
+    <path d="M250 150 Q350 200 250 250 Q150 300 250 350" stroke="#fff" stroke-width="2" fill="none" opacity="0.3"/>
+  </svg>
+</section>
+
+<!-- Wave Divider -->
+<div class="section-divider">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,40 C360,80 720,0 1080,40 C1260,60 1380,20 1440,40 L1440,80 L0,80 Z" fill="#F5F0E8"/>
+  </svg>
+</div>
+
+<!-- PROBLEM -->
+<section id="problem">
+  <div class="container">
+    <div class="problem-grid">
+      <div data-animate>
+        <div class="section-label" style="text-align:left">
+          <span class="overline">The Problem</span>
+          <h2>Good Food Goes to Waste While Families Go Hungry</h2>
+        </div>
+        <p style="color:var(--muted); margin-bottom:20px;">Every year in the United States, over 80 million tons of food end up in landfills — much of it still fresh and perfectly edible. At the same time, 1 in 8 families struggles to put a meal on the table. The disconnect isn't about supply; it's about logistics. Restaurants toss unsold meals at closing. Grocery stores discard produce that didn't sell by its shelf date. Farms leave imperfect crops in the field.</p>
+        <p style="color:var(--muted);">The food is there. The need is there. What's missing is the bridge — a fast, reliable system to rescue surplus and deliver it to people who need it before it spoils.</p>
+        <div class="stat-row">
+          <div class="stat-card">
+            <div class="stat-num">80M</div>
+            <div class="stat-label">Tons of food wasted annually in the U.S.</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-num">1 in 8</div>
+            <div class="stat-label">Families face food insecurity</div>
+          </div>
+        </div>
+      </div>
+      <div class="problem-img" data-animate>
+        <img src="assets/problem-bg.jpg" alt="Surplus food being discarded while still edible" loading="lazy">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVOLUTION -->
+<section id="evolution">
+  <div class="container">
+    <div class="section-label" data-animate>
+      <span class="overline">Our Journey</span>
+      <h2>From a Student Idea to a Community Lifeline</h2>
+      <p>What began as a computer science project to track food waste became a full-fledged organization rescuing thousands of meals every week.</p>
+    </div>
+    <div class="evo-timeline">
+      <div class="evo-step" data-animate>
+        <div class="evo-dot"></div>
+        <h3>The Spark</h3>
+        <p>Jane Doe noticed that local restaurants were throwing away trays of untouched food every night. As a computer science student, she believed technology could close the gap between surplus and need.</p>
+      </div>
+      <div class="evo-step" data-animate>
+        <div class="evo-dot"></div>
+        <h3>The Prototype</h3>
+        <p>She built a mobile app that allowed restaurant managers to flag available surplus with one tap. Volunteers nearby would receive an alert and pick up the food within the hour.</p>
+      </div>
+      <div class="evo-step" data-animate>
+        <div class="evo-dot"></div>
+        <h3>First Partnerships</h3>
+        <p>Local grocery stores and farms saw the potential and joined. Fresh produce that would have been composted instead found its way to shelters and community fridges.</p>
+      </div>
+      <div class="evo-step" data-animate>
+        <div class="evo-dot"></div>
+        <h3>HarvestLoop Is Born</h3>
+        <p>With growing demand and a proven model, the project formally launched as HarvestLoop — a nonprofit dedicated to creating a continuous loop of rescued food flowing to those who need it most.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Divider -->
+<div class="section-divider">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,20 C240,70 480,0 720,40 C960,80 1200,10 1440,50 L1440,80 L0,80 Z" fill="#F5F0E8"/>
+  </svg>
+</div>
+
+<!-- PROGRAMS -->
+<section id="programs">
+  <div class="container">
+    <div class="section-label" data-animate>
+      <span class="overline">What We Do</span>
+      <h2>Programs That Keep Food in the Loop</h2>
+      <p>Each initiative tackles a different link in the chain from surplus to table.</p>
+    </div>
+    <div class="programs-grid">
+      <div class="program-card" data-animate>
+        <div class="program-card-img">
+          <img src="assets/program1.jpg" alt="Surplus meal rescue from restaurant kitchens" loading="lazy">
+        </div>
+        <div class="program-card-body">
+          <span class="tag">Rescue</span>
+          <h3>The Rescue Loop</h3>
+          <p>Our same-day pickup network uses real-time alerts to match surplus meals from restaurants and caterers with volunteer drivers who deliver directly to shelters — often within 90 minutes of the food being flagged.</p>
+        </div>
+      </div>
+      <div class="program-card" data-animate>
+        <div class="program-card-img">
+          <img src="assets/program2.jpg" alt="Fresh farm produce being sorted for distribution" loading="lazy">
+        </div>
+        <div class="program-card-body">
+          <span class="tag">Partnerships</span>
+          <h3>FreshCraft Partnerships</h3>
+          <p>We work with local farms and community gardens to channel imperfect but nutritious produce directly into our distribution network — bypassing the cosmetic standards that lead to farm-level waste.</p>
+        </div>
+      </div>
+      <div class="program-card" data-animate>
+        <div class="program-card-img">
+          <img src="assets/program3.jpg" alt="Mobile app connecting food donors with volunteers" loading="lazy">
+        </div>
+        <div class="program-card-body">
+          <span class="tag">Technology</span>
+          <h3>LoopConnect App</h3>
+          <p>Our mobile platform is the nerve center of everything we do. Donors list surplus in seconds, volunteers claim pickups on a live map, and shelters track incoming deliveries — all in real time.</p>
+        </div>
+      </div>
+      <div class="program-card" data-animate>
+        <div class="program-card-img">
+          <img src="assets/program4.jpg" alt="Community volunteers at a weekly meal distribution drive" loading="lazy">
+        </div>
+        <div class="program-card-body">
+          <span class="tag">Community</span>
+          <h3>SeedStart Kitchen Circles</h3>
+          <p>Weekly gatherings where families learn to prepare nutritious meals from rescued ingredients. Led by local chefs, these sessions build cooking confidence and reduce repeat food waste at the household level.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- IMPACT -->
+<section id="impact">
+  <div class="container">
+    <div class="impact-hero" data-animate>
+      <img src="assets/impact-bg.jpg" alt="Families sharing a meal together" loading="lazy">
+      <div class="impact-hero-overlay">
+        <div class="impact-hero-text">
+          <h2>Our Impact Goals</h2>
+          <p>We measure success not in dollars raised but in meals rescued, families fed, and tons of waste diverted from landfills.</p>
+        </div>
+      </div>
+    </div>
+    <div class="impact-stats">
+      <div class="impact-stat" data-animate>
+        <div class="icon-wrap">
+          <!-- Meal icon: plate with utensils -->
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="14" r="10" stroke="#4A7C59" stroke-width="2"/>
+            <path d="M10 10v8M18 10c0 2-1.5 3-4 3" stroke="#4A7C59" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M18 10v8" stroke="#4A7C59" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="num">50,000</div>
+        <div class="label">Meals rescued annually</div>
+      </div>
+      <div class="impact-stat" data-animate>
+        <div class="icon-wrap">
+          <!-- Family icon -->
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="10" cy="9" r="3" stroke="#4A7C59" stroke-width="1.5"/>
+            <circle cx="18" cy="9" r="3" stroke="#4A7C59" stroke-width="1.5"/>
+            <path d="M5 22c0-3 2.5-5 5-5h8c2.5 0 5 2 5 5" stroke="#4A7C59" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="num">2,400</div>
+        <div class="label">Families served each month</div>
+      </div>
+      <div class="impact-stat" data-animate>
+        <div class="icon-wrap">
+          <!-- Leaf/Earth icon -->
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M8 22c2-8 10-14 16-14-2 6-6 12-14 14" stroke="#4A7C59" stroke-width="1.5" fill="rgba(74,124,89,0.1)" stroke-linejoin="round"/>
+            <path d="M8 22C10 18 14 14 20 12" stroke="#4A7C59" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="num">320</div>
+        <div class="label">Tons of waste diverted yearly</div>
+      </div>
+      <div class="impact-stat" data-animate>
+        <div class="icon-wrap">
+          <!-- Volunteers icon -->
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <path d="M14 6v7M10.5 9.5L14 13l3.5-3.5" stroke="#4A7C59" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="14" cy="19" r="5" stroke="#4A7C59" stroke-width="1.5"/>
+            <path d="M12 19h4" stroke="#4A7C59" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="num">600+</div>
+        <div class="label">Active volunteers</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Divider -->
+<div class="section-divider">
+  <svg viewBox="0 0 1440 80" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M0,60 C360,10 720,70 1080,30 C1260,10 1380,50 1440,20 L1440,80 L0,80 Z" fill="#F5F0E8"/>
+  </svg>
+</div>
+
+<!-- FOUNDER -->
+<section id="founder">
+  <div class="container">
+    <div class="section-label" data-animate>
+      <span class="overline">Our Founder</span>
+      <h2>Meet Jane Doe</h2>
+    </div>
+    <div class="founder-grid" data-animate>
+      <div class="founder-portrait" id="founder-img-wrap">
+        <!-- Inline SVG placeholder avatar -->
+        <svg id="founder-placeholder" width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="90" cy="70" r="35" fill="#4A7C59" opacity="0.2"/>
+          <circle cx="90" cy="70" r="28" fill="#4A7C59" opacity="0.3"/>
+          <ellipse cx="90" cy="155" rx="50" ry="40" fill="#4A7C59" opacity="0.15"/>
+          <circle cx="90" cy="70" r="22" fill="#4A7C59" opacity="0.15"/>
+          <circle cx="82" cy="65" r="2.5" fill="#4A7C59" opacity="0.5"/>
+          <circle cx="98" cy="65" r="2.5" fill="#4A7C59" opacity="0.5"/>
+          <path d="M84 78 Q90 84 96 78" stroke="#4A7C59" stroke-width="2" stroke-linecap="round" fill="none" opacity="0.4"/>
+        </svg>
+      </div>
+      <div class="founder-info">
+        <div class="quote">"I kept watching perfectly good food go into dumpsters while people a few blocks away went to bed hungry. I couldn't just watch — I had to build something."</div>
+        <p class="name-title">Jane Doe — Founder & Executive Director</p>
+        <p>Jane is a computer science student who channeled her technical skills into solving one of her community's most urgent problems. What started as a class project to map food waste patterns grew into a real-time rescue network that now operates across multiple neighborhoods.</p>
+        <p>She designed and built the LoopConnect app from scratch, personally recruited the first 50 volunteer drivers, and forged partnerships with over 30 local restaurants and grocery stores. Jane believes that technology should serve human needs first — and HarvestLoop is her proof of concept.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-label" data-animate>
+      <span class="overline">Get in Touch</span>
+      <h2>We'd Love to Hear From You</h2>
+      <p>Whether you want to volunteer, donate food, or partner with us — reach out.</p>
+    </div>
+    <div class="contact-wrap" data-animate>
+      <form class="contact-form" id="contactForm" novalidate>
+        <div class="form-group">
+          <label for="contact-name">Your Name</label>
+          <input type="text" id="contact-name" required placeholder="Full name">
+        </div>
+        <div class="form-group">
+          <label for="contact-email">Email Address</label>
+          <input type="email" id="contact-email" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="contact-message">Message</label>
+          <textarea id="contact-message" required placeholder="Tell us how you'd like to help or what you'd like to know..."></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary" style="align-self:flex-start;">Send Message</button>
+      </form>
+      <p class="contact-email-note">Or email us directly at <a href="mailto:example@example.com" class="footer-email">example@example.com</a></p>
+    </div>
+  </div>
+</section>
+
+<!-- DONATE -->
+<section id="donate">
+  <!-- Decorative SVG: large circular loop pattern -->
+  <svg class="donate-bg-svg" width="400" height="400" viewBox="0 0 400 400" fill="none">
+    <circle cx="200" cy="200" r="180" stroke="#fff" stroke-width="2"/>
+    <circle cx="200" cy="200" r="140" stroke="#fff" stroke-width="1.5"/>
+    <circle cx="200" cy="200" r="100" stroke="#fff" stroke-width="1"/>
+    <path d="M100 200 Q150 100 200 200 Q250 300 300 200" stroke="#fff" stroke-width="2" fill="none"/>
+    <path d="M200 100 Q300 150 200 200 Q100 250 200 300" stroke="#fff" stroke-width="1.5" fill="none"/>
+  </svg>
+  <div class="container" style="text-align:center; position:relative; z-index:1;">
+    <div data-animate>
+      <span class="overline" style="color:rgba(255,255,255,0.7);">Support Our Mission</span>
+      <h2>Keep the Loop Going</h2>
+      <p style="max-width:520px; margin:0 auto;">Your donation fuels same-day meal rescues, supports volunteer operations, and keeps our technology running so no good food goes to waste.</p>
+    </div>
+    <div class="donate-card" data-animate>
+      <p class="donate-desc">Choose an amount to rescue meals today:</p>
+      <div class="amount-grid">
+        <button class="amount-btn" data-amount="10">$10</button>
+        <button class="amount-btn active" data-amount="25">$25</button>
+        <button class="amount-btn" data-amount="50">$50</button>
+        <button class="amount-btn" data-amount="100">$100</button>
+        <button class="amount-btn" data-amount="250">$250</button>
+        <button class="amount-btn" data-amount="500">$500</button>
+      </div>
+      <input type="text" class="custom-amount" placeholder="Or enter a custom amount ($)" id="customAmount">
+      <button class="donate-submit" id="donateBtn">Continue to Donate</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div>
+        <div class="footer-brand">HarvestLoop</div>
+        <p class="footer-tagline">Closing the loop on food waste and hunger — one rescued meal at a time.</p>
+      </div>
+      <ul class="footer-nav">
+        <li><a href="#home">Home</a></li>
+        <li><a href="#problem">About</a></li>
+        <li><a href="#programs">Programs</a></li>
+        <li><a href="#contact">Contact</a></li>
+        <li><a href="#donate">Donate</a></li>
+      </ul>
+      <div>
+        <p>Email: <a href="mailto:example@example.com" class="footer-email">example@example.com</a></p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      &copy; 2026 HarvestLoop. All rights reserved.
+    </div>
+  </div>
+</footer>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="donateModal">
+  <div class="modal">
+    <div class="modal-check">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+        <path d="M8 16l6 6 10-12" stroke="#4A7C59" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h3>Thank You!</h3>
+    <p id="modalMsg">Your generous donation of $25 will rescue approximately 12 meals this week. We'll send a confirmation to your email.</p>
+    <button class="modal-close" id="modalClose">Close</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  'use strict';
+
+  // Smooth scroll polyfill for older browsers
+  if (!('scrollBehavior' in document.documentElement.style)) {
+    document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+      anchor.addEventListener('click', function(e) {
+        var id = this.getAttribute('href');
+        var target = document.querySelector(id);
+        if (target) {
+          e.preventDefault();
+          var top = target.getBoundingClientRect().top + window.pageYOffset - 80;
+          var start = window.pageYOffset;
+          var diff = top - start;
+          var duration = 600;
+          var startTime = null;
+          function step(ts) {
+            if (!startTime) startTime = ts;
+            var progress = Math.min((ts - startTime) / duration, 1);
+            var ease = progress < 0.5 ? 2 * progress * progress : -1 + (4 - 2 * progress) * progress;
+            window.scrollTo(0, start + diff * ease);
+            if (progress < 1) requestAnimationFrame(step);
+          }
+          requestAnimationFrame(step);
+        }
+      });
+    });
+  }
+
+  // Sticky nav scroll effect
+  var nav = document.querySelector('.nav');
+  window.addEventListener('scroll', function() {
+    nav.classList.toggle('scrolled', window.scrollY > 30);
+  });
+
+  // Hamburger
+  var hamburger = document.querySelector('.hamburger');
+  var navLinks = document.querySelector('.nav-links');
+  hamburger.addEventListener('click', function() {
+    var open = navLinks.classList.toggle('open');
+    hamburger.setAttribute('aria-expanded', open);
+  });
+  navLinks.querySelectorAll('a').forEach(function(link) {
+    link.addEventListener('click', function() {
+      navLinks.classList.remove('open');
+      hamburger.setAttribute('aria-expanded', 'false');
+    });
+  });
+
+  // IntersectionObserver for animations
+  if ('IntersectionObserver' in window) {
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('[data-animate]').forEach(function(el) {
+      observer.observe(el);
+    });
+  } else {
+    document.querySelectorAll('[data-animate]').forEach(function(el) {
+      el.classList.add('no-io');
+    });
+  }
+
+  // Founder image check
+  (function() {
+    var img = new Image();
+    img.onload = function() {
+      var wrap = document.getElementById('founder-img-wrap');
+      var placeholder = document.getElementById('founder-placeholder');
+      if (placeholder) placeholder.style.display = 'none';
+      var photo = document.createElement('img');
+      photo.src = 'assets/founder.png';
+      photo.alt = 'Jane Doe, Founder of HarvestLoop';
+      wrap.appendChild(photo);
+    };
+    img.onerror = function() { /* keep SVG placeholder */ };
+    img.src = 'assets/founder.png';
+  })();
+
+  // Toast helper
+  function showToast(msg) {
+    var toast = document.getElementById('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(function() { toast.classList.remove('show'); }, 3500);
+  }
+
+  // Contact form
+  var contactForm = document.getElementById('contactForm');
+  contactForm.addEventListener('submit', function(e) {
+    e.preventDefault();
+    var valid = true;
+    var inputs = contactForm.querySelectorAll('[required]');
+    inputs.forEach(function(inp) {
+      inp.classList.remove('invalid');
+      if (!inp.value.trim()) {
+        inp.classList.add('invalid');
+        valid = false;
+      }
+      if (inp.type === 'email' && inp.value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(inp.value)) {
+        inp.classList.add('invalid');
+        valid = false;
+      }
+    });
+    if (valid) {
+      showToast('Message sent! We\'ll get back to you soon.');
+      contactForm.reset();
+    }
+  });
+
+  // Donate
+  var selectedAmount = 25;
+  var amountBtns = document.querySelectorAll('.amount-btn');
+  var customInput = document.getElementById('customAmount');
+
+  amountBtns.forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      amountBtns.forEach(function(b) { b.classList.remove('active'); });
+      btn.classList.add('active');
+      selectedAmount = parseInt(btn.dataset.amount);
+      customInput.value = '';
+    });
+  });
+
+  customInput.addEventListener('input', function() {
+    var val = parseInt(this.value.replace(/\D/g, ''));
+    if (val > 0) {
+      amountBtns.forEach(function(b) { b.classList.remove('active'); });
+      selectedAmount = val;
+    }
+  });
+
+  var donateBtn = document.getElementById('donateBtn');
+  var donateModal = document.getElementById('donateModal');
+  var modalMsg = document.getElementById('modalMsg');
+  var modalClose = document.getElementById('modalClose');
+
+  donateBtn.addEventListener('click', function() {
+    var amt = selectedAmount || 25;
+    var meals = Math.round(amt / 2.1);
+    modalMsg.textContent = 'Your generous donation of $' + amt + ' will rescue approximately ' + meals + ' meals this week. We\'ll send a confirmation to your email.';
+    donateModal.classList.add('show');
+  });
+
+  modalClose.addEventListener('click', function() {
+    donateModal.classList.remove('show');
+  });
+  donateModal.addEventListener('click', function(e) {
+    if (e.target === donateModal) donateModal.classList.remove('show');
+  });
+
+  // Nav smooth scroll offset
+  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      var id = this.getAttribute('href');
+      var el = document.querySelector(id);
+      if (el) {
+        e.preventDefault();
+        var y = el.getBoundingClientRect().top + window.pageYOffset - 72;
+        window.scrollTo({ top: y, behavior: 'smooth' });
+      }
+    });
+  });
+
+})();
+</script>
+</body>
+</html>
